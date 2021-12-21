@@ -14,13 +14,16 @@ public:
 	TriangleSample();
 	virtual ~TriangleSample();
 
-	//virtual void LoadImage(NativeImage *pImage);
-
 	virtual void Init();
 
 	virtual void Draw(int screenW, int screenH);
 
 	virtual void Destroy();
+
+	int64_t getCurrentLocalTimeStamp();
+
+private:
+	int mTimeColorLocation;
 };
 
 

@@ -6,7 +6,8 @@
 MyGLRenderContext* MyGLRenderContext::mContext = nullptr;
 
 MyGLRenderContext::MyGLRenderContext() : mAAssetManager(NULL) {
-	//m_Sample = new TriangleSample;
+	m_pBeforeSample = nullptr;
+	m_pCurSample = new TextureMapSample;
 }
 
 MyGLRenderContext::~MyGLRenderContext() {
@@ -14,7 +15,6 @@ MyGLRenderContext::~MyGLRenderContext() {
 
 void MyGLRenderContext::OnSurfaceCreated() {
 	glClearColor(0.0f,0.0f,0.0f, 1.0f);
-    mSample->Init();
 }
 
 void MyGLRenderContext::OnSurfaceChanged(int width, int height) {
@@ -25,7 +25,20 @@ void MyGLRenderContext::OnSurfaceChanged(int width, int height) {
 
 void MyGLRenderContext::OnDrawFrame() {
 	glClear(GL_DEPTH_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
-    mSample->Draw(mScreenW, mScreenH);
+	mLock.lock();
+	if (m_pBeforeSample)
+	{
+		m_pBeforeSample->Destroy();
+		delete m_pBeforeSample;
+		m_pBeforeSample = nullptr;
+	}
+
+	if (m_pCurSample)
+	{
+		m_pCurSample->Init();
+		m_pCurSample->Draw(mScreenW, mScreenH);
+	}
+	mLock.unlock();
 }
 
 void MyGLRenderContext::SetAssetManager(AAssetManager *nativeasset) {
@@ -73,12 +86,34 @@ void MyGLRenderContext::SetImageData(int format, int width, int height, uint8_t 
 		default:
 			break;
 	}
-
-	if (mSample)
+	mLock.lock();
+	if (m_pCurSample)
 	{
-		mSample->LoadImage(&nativeImage);
+		m_pCurSample->LoadImage(&nativeImage);
 	}
+	mLock.unlock();
+}
 
+void MyGLRenderContext::setExampleType(int type) {
+	mLock.lock();
+	m_pBeforeSample = m_pCurSample;
+	switch (type) {
+		case SAMPLE_TYPE_KEY_TRIANGLE:
+			m_pCurSample = new TriangleSample;
+			break;
+		case SAMPLE_TYPE_KEY_TEXTURE_MAP:
+			m_pCurSample = new TextureMapSample;
+			break;
+		case SAMPLE_TYPE_KEY_FBO:
+			m_pCurSample = new FBOSample;
+			break;
+		case SAMPLE_TYPE_KEY_MRT:
+			m_pCurSample = new MRTSample;
+			break;
+		default:
+			break;
+	}
+	mLock.unlock();
 }
 
 

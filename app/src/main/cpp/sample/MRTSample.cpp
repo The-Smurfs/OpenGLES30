@@ -50,6 +50,8 @@ MRTSample::~MRTSample() {
 }
 
 void MRTSample::Init() {
+    Destroy();
+
     // 顶点坐标
     GLfloat vertices[] = {
             -1.0f, -1.0f, 0.0f,
@@ -227,13 +229,38 @@ void MRTSample::Init() {
         LOGCATE("FBOSample::Init CreateFrameBufferObj fail");
         return;
     }
+
+    mInitialized = true;
 }
 
 void MRTSample::Destroy() {
+    if (mProgramObj)
+    {
+        glDeleteProgram(mProgramObj);
+        mProgramObj = GL_NONE;
+    }
+    if (mImageTextureId) {
+        glDeleteTextures(1, &mImageTextureId);
+        mImageTextureId = GL_NONE;
+    }
 
+    if (mFboTextureId) {
+        glDeleteTextures(1, &mFboTextureId[0]);
+    }
+
+    if (mVaoIds != GL_NONE) {
+        glDeleteVertexArrays(1, &mVaoIds[0]);
+    }
+
+    if (mVboIds != GL_NONE) {
+        glDeleteBuffers(1, &mVboIds[0]);
+    }
 }
 
 void MRTSample::Draw(int screenW, int screenH) {
+    if (!mInitialized) {
+        Init();
+    }
     //首先获取当前默认帧缓冲区的 id
     GLint defaultFrameBuffer = GL_NONE;
     glGetIntegerv(GL_FRAMEBUFFER_BINDING, &defaultFrameBuffer);
@@ -244,7 +271,7 @@ void MRTSample::Draw(int screenW, int screenH) {
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     glViewport(0, 0, mRenderImage.width, mRenderImage.height);
     glClear(GL_COLOR_BUFFER_BIT);
-    glDrawBuffers(ATTACHMENT_NUM, attachments);
+    //glDrawBuffers(ATTACHMENT_NUM, attachments);
 
     glUseProgram(mFboProgramObj);
     glBindVertexArray(mVaoIds[1]);
@@ -257,7 +284,7 @@ void MRTSample::Draw(int screenW, int screenH) {
     glBindVertexArray(0);
     glBindTexture(GL_TEXTURE_2D, 0);
 
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+    glBindFramebuffer(GL_FRAMEBUFFER, defaultFrameBuffer);
 
     // 普通渲染
     // Do normal rendering
@@ -291,6 +318,7 @@ void MRTSample::LoadImage(NativeImage *pImage) {
         mRenderImage.format = pImage->format;
         NativeImageUtil::CopyNativeImage(pImage, &mRenderImage);
     }
+    mInitialized = false;
 }
 
 bool MRTSample::createFrameBufferObject() {

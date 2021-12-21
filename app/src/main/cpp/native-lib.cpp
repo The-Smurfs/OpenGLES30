@@ -67,6 +67,11 @@ JNIEXPORT void JNICALL native_SetImageData
     env->DeleteLocalRef(imageData);
 }
 
+JNIEXPORT void JNICALL native_SetExampleType(JNIEnv *env, jobject instance, jint paramType)
+{
+	MyGLRenderContext::GetInstance()->setExampleType(paramType);
+};
+
 #ifdef __cplusplus
 }
 #endif
@@ -77,6 +82,7 @@ static JNINativeMethod g_RenderMethods[] = {
 		{"native_OnDrawFrame",               "()V",       (void *)(native_OnDrawFrame)},
         {"native_SetImageData",               "(III[B)V",       (void *)(native_SetImageData)},
         {"native_SetAssetManager",               "(Landroid/content/res/AssetManager;)V",       (void *)(native_SetAssetManager)},
+		{"native_SetExampleType",              "(I)V",    (void *)(native_SetExampleType)},
 };
 
 static int RegisterNativeMethods(JNIEnv *env, const char *className, JNINativeMethod *methods, int methodNum)

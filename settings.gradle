@@ -1,2 +1,4 @@
 include ':app'
 rootProject.name = "OpenGLES_NDK"
+include ':camera'
+include ':afocamera'

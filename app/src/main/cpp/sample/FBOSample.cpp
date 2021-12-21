@@ -14,6 +14,8 @@ FBOSample::~FBOSample() {
 }
 
 void FBOSample::Init() {
+    Destroy();
+
     // 顶点坐标
     GLfloat vertices[] = {
         -1.0f, -1.0f, 0.0f,
@@ -168,9 +170,14 @@ void FBOSample::Init() {
         LOGCATE("FBOSample::Init CreateFrameBufferObj fail");
         return;
     }
+
+    mInitialized = true;
 }
 
 void FBOSample::Draw(int screenW, int screenH) {
+    if (!mInitialized) {
+        Init();
+    }
     // 离屏渲染
     glPixelStorei(GL_UNPACK_ALIGNMENT,1);
     glViewport(0, 0, mRenderImage.width, mRenderImage.height);
@@ -207,7 +214,28 @@ void FBOSample::Draw(int screenW, int screenH) {
 }
 
 void FBOSample::Destroy() {
+    if (mProgramObj)
+    {
+        glDeleteProgram(mProgramObj);
+        mProgramObj = GL_NONE;
+    }
+    if (mImageTextureId) {
+        glDeleteTextures(1, &mImageTextureId);
+        mImageTextureId = GL_NONE;
+    }
 
+    if (mFboTextureId) {
+        glDeleteTextures(1, &mFboTextureId);
+        mFboTextureId = GL_NONE;
+    }
+
+    if (mVaoIds != GL_NONE) {
+        glDeleteVertexArrays(1, &mVaoIds[0]);
+    }
+
+    if (mVboIds != GL_NONE) {
+        glDeleteBuffers(1, &mVboIds[0]);
+    }
 }
 
 void FBOSample::LoadImage(NativeImage *pImage) {
@@ -219,6 +247,7 @@ void FBOSample::LoadImage(NativeImage *pImage) {
         mRenderImage.format = pImage->format;
         NativeImageUtil::CopyNativeImage(pImage, &mRenderImage);
     }
+    mInitialized = false;
 }
 
 bool FBOSample::createFrameBufferObject() {

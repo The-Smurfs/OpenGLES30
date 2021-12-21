@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/DrawTriangle"
+        android:icon="@mipmap/ic_launcher"
+        android:title="绘制三角形"/>
+
+    <item
+        android:id="@+id/TextureMix"
+        android:icon="@mipmap/ic_launcher"
+        android:title="纹理混合"/>
+
+    <item
+        android:id="@+id/FBO"
+        android:icon="@mipmap/ic_launcher"
+        android:title="FBO"/>
+
+    <item
+        android:id="@+id/MRT"
+        android:icon="@mipmap/ic_launcher"
+        android:title="MRT"/>
+</menu>

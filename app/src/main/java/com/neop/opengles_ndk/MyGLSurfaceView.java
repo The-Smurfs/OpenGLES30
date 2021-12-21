@@ -1,5 +1,9 @@
 package com.neop.opengles_ndk;
 
+import static com.neop.opengles_ndk.MyNativeRender.SAMPLE_TYPE_FBO;
+import static com.neop.opengles_ndk.MyNativeRender.SAMPLE_TYPE_KEY_MRT;
+import static com.neop.opengles_ndk.MyNativeRender.SAMPLE_TYPE_TEXTURE_MAP;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -28,19 +32,27 @@ public class MyGLSurfaceView extends GLSurfaceView {
     public MyGLSurfaceView(Context context, AttributeSet attrs) {
         super(context, attrs);
         // 设置OpenGL ES的版本
-        this.setEGLContextClientVersion(3);//3.0版本
-        // 设置渲染器
-        mNativeRender = new MyNativeRender();// 创建native render对象
-        mNativeRender.native_SetAssetManager(context.getAssets());
-        getRGBAImage();
+        // 3.0版本
+        this.setEGLContextClientVersion(3);
 
+        // 创建native render对象
+        mNativeRender = new MyNativeRender();
+        mNativeRender.native_SetAssetManager(context.getAssets());
+
+        // native层加载图像
+        getRGBAImage(R.drawable.lye);
+        getRGBAImage(R.drawable.dzzz);
+
+        // 设置渲染器
         mRender = new MyGLRender(mNativeRender);
         this.setRenderer(mRender);
-        this.setRenderMode(RENDERMODE_CONTINUOUSLY);// 设置渲染模式为连续渲染模式
+
+        // 设置渲染模式为连续渲染模式
+        this.setRenderMode(RENDERMODE_CONTINUOUSLY);
     }
 
-    public void getRGBAImage() {
-        @SuppressLint("ResourceType") InputStream is = this.getResources().openRawResource(R.drawable.huge);
+    public void getRGBAImage(int id) {
+        @SuppressLint("ResourceType") InputStream is = this.getResources().openRawResource(id);
 
         Bitmap bitmap;
         try {
@@ -63,6 +75,26 @@ public class MyGLSurfaceView extends GLSurfaceView {
             {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void setRenderType(int type) {
+        mNativeRender.native_SetExampleType(type);
+
+        switch (type) {
+            case SAMPLE_TYPE_TEXTURE_MAP:
+                // native层加载图像
+                getRGBAImage(R.drawable.lye);
+                getRGBAImage(R.drawable.dzzz);
+                break;
+            case SAMPLE_TYPE_FBO:
+                getRGBAImage(R.drawable.dzzz);
+                break;
+            case SAMPLE_TYPE_KEY_MRT:
+                getRGBAImage(R.drawable.huge);
+                break;
+            default:
+                break;
         }
     }
 }

@@ -8,6 +8,7 @@
 #include "stdint.h"
 #include <GLES2/gl2.h>
 #include <GLES3/gl3.h>
+#include <mutex>
 #include <GLSampleBase.h>
 #include <android/asset_manager.h>
 #include <MRTSample.h>
@@ -34,6 +35,8 @@ public:
 
 	void SetImageData(int format, int width, int height, uint8_t *pData);
 
+	void setExampleType(int type);
+
 	static MyGLRenderContext* GetInstance();
 	static void DestroyInstance();
 
@@ -42,10 +45,10 @@ private:
 	AAssetManager* mAAssetManager;
 	int mScreenW;
 	int mScreenH;
-    //TriangleSample* mSample = new TriangleSample;
-    //TextureMapSample* mSample = new TextureMapSample;
-    FBOSample* mSample = new FBOSample();
-    //MRTSample* mSample = new MRTSample();
+    GLSampleBase* m_pBeforeSample;
+    GLSampleBase* m_pCurSample;
+
+    std::mutex mLock;
 };
 
 

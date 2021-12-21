@@ -58,6 +58,7 @@ class GLSampleBase
 public:
 	GLSampleBase()
 	{
+		mInitialized = false;
 		mProgramObj = 0;
 		mVertexShader = 0;
 		mFragmentShader = 0;
@@ -70,7 +71,20 @@ public:
 
 	virtual ~GLSampleBase()
 	{
+		if (VAO != GL_NONE) {
+			glDeleteVertexArrays(1, &VAO);
+			VAO = GL_NONE;
+		}
 
+		if (VBO != GL_NONE) {
+			glDeleteBuffers(1, &VBO);
+			VBO = GL_NONE;
+		}
+
+		if (EBO != GL_NONE) {
+			glDeleteBuffers(1, &EBO);
+			EBO = GL_NONE;
+		}
 	}
 
 	virtual void LoadImage(NativeImage *pImage)
@@ -104,6 +118,7 @@ protected:
 	int mSurfaceWidth;
 	int mSurfaceHeight;
 	unsigned int VAO,VBO,EBO;
+	bool mInitialized;
 };
 
 

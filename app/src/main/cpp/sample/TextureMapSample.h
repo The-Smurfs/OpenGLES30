@@ -25,6 +25,9 @@ private:
     GLuint mTextureId;
     GLint mSamplerLoc;
     NativeImage mRenderImage;
+    GLint mSamplerLoc2;
+    GLuint mTextureId2;
+    NativeImage mRenderImage2;
 };
 
 
